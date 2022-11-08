@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const bcrypt = require("bcrypt");
 const db = require("./db/db");
 
 ///////////////  Variables defined  ///////////////
@@ -143,37 +144,118 @@ app.get("/api/restaurants", async (req, res) => {
 ///////////////////////////////////////////////////
 
 // Get a restaurant staff
-app.post("/api/restaurants/:id/staff/:staff_id", (req, res) => {
-  console.log(req.params);
-  res.status(200).json({
-    status: "retrieve one successful",
-  });
+app.post("/api/restaurants/:id/staff/:staff_id", async (req, res) => {
+  try {
+    const results = await db.query(
+      "SELECT restaurant_staff.id, username, restaurant_staff.name, last_name, email, role, resigned FROM restaurant_staff where restaurant_id = $1 AND restaurant_staff.id = $2",
+      [req.params.id, req.params.staff_id]
+    );
+    console.log(results.rows);
+    res.status(200).json({
+      status: "retrieve staff profile successful",
+      result: results.rows[0].name + " " + results.rows[0].last_name,
+      data: { staff: results.rows[0] },
+    });
+  } catch (error) {
+    console.log("POST /api/restaurants/:id/staff/:staff_id", error);
+    if (error) {
+      res.status(400).json({
+        status: "error",
+        message: "an error has occurred when retrieving staff profile",
+      });
+    }
+  }
 });
 
 // Update a restaurant staff
-app.patch("/api/restaurants/:id/staff/:staff_id", (req, res) => {
-  console.log(req.params);
-  console.log(req.body);
-  res.status(200).json({
-    status: "update successful",
-  });
+app.patch("/api/restaurants/:id/staff/:staff_id", async (req, res) => {
+  try {
+    const results = await db.query();
+    console.log(req.params);
+    console.log(results.rows);
+    res.status(200).json({
+      status: "update successful",
+    });
+  } catch (error) {
+    console.log("PATCH /api/restaurants/:id/staff/:staff_id", error);
+    if (error) {
+      res.status(400).json({
+        status: "error",
+        message: "an error has occurred when updating staff profile",
+      });
+    }
+  }
 });
 
 // Delete a restaurant staff
-app.delete("/api/restaurants/:id/staff/:staff_id", (req, res) => {
-  console.log(req.params);
-  console.log(req.body);
-  res.status(200).json({
-    status: "delete successful",
-  });
+app.delete("/api/restaurants/:id/staff/:staff_id", async (req, res) => {
+  try {
+    const results = await db.query(
+      "DELETE FROM restaurant_staff where id = $1 RETURNING *",
+      [req.params.staff_id]
+    );
+    console.log(results.rows);
+    res.status(200).json({
+      status: "delete successful",
+      data: { remaining_staff: results.rows },
+    });
+  } catch (error) {
+    console.log("DELETE /api/restaurants/:id/staff/:staff_id", error);
+    if (error) {
+      res.status(400).json({
+        status: "error",
+        message: "an error has occurred when deleting a staff profile",
+      });
+    }
+  }
 });
 
 // Create a restaurant staff
-app.put("/api/restaurants/:id/staff", (req, res) => {
-  console.log(req.body);
-  res.status(200).json({
-    status: "create successful",
-  });
+app.put("/api/restaurants/:id/staff", async (req, res) => {
+  try {
+    // Check if there s a duplicate username
+    const duplicateUsername = await db.query(
+      "SELECT * FROM restaurant_staff WHERE username = $1",
+      [req.body.username]
+    );
+
+    // If username does not exist in database, account will be created
+    if (!duplicateUsername) {
+      const hash = await bcrypt.hash(req.body.password, 12);
+      const results = await db.query(
+        "INSERT INTO restaurant_staff (username, name, last_name, email, password, role, resigned, restaurant_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+        [
+          req.body.username,
+          req.body.name,
+          req.body.last_name,
+          req.body.email,
+          hash,
+          req.body.role,
+          req.body.resigned,
+          req.params.id,
+        ]
+      );
+      console.log(results.rows);
+      console.log(req.params.id);
+      res.status(200).json({
+        status: "create successful",
+        data: { staff: results.rows[0] },
+      });
+    } else {
+      res.status(400).json({
+        status: "error",
+        message: "duplicate username",
+      });
+    }
+  } catch (error) {
+    console.log("PUT /api/restaurants/:id/staff", error);
+    if (error) {
+      res.status(400).json({
+        status: "error",
+        message: "an error has occurred when creating a staff profile",
+      });
+    }
+  }
 });
 
 // Get all restaurant staff
