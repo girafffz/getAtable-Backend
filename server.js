@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const restaurants = require("./routers/restaurants/restaurants");
 const staff = require("./routers/restaurants/staff");
+const seatsCapacity = require("./routers/restaurants/seatsCapacity");
 
 ///////////////  Variables defined  ///////////////
 const app = express();
@@ -18,6 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 ////////////////////  ROUTES  /////////////////////
 app.use("/api/restaurants", restaurants);
 app.use("/api/restaurants", staff);
+app.use("/api/restaurants", seatsCapacity);
 
 ///////////////////////////////////////////////////
 //////////////  RESTAURANT REVIEWS  ///////////////
@@ -62,89 +64,6 @@ app.get("/api/restaurants/:id/reviews", (req, res) => {
   res.status(200).json({
     status: "retrieve all successful",
   });
-});
-
-///////////////////////////////////////////////////
-///////////  RESTAURANT SEATS CAPACITY  ///////////
-///////////////////////////////////////////////////
-
-// Get seats capacity (to fetch whenever there is a change in status, assumptions: no sharing of tables with different groups of people)
-app.get("/api/restaurants/:id/capacity", async (req, res) => {
-  try {
-    const results = await db.query(
-      "SELECT table_num, table_capacity, table_occupied FROM restaurant_seats_capacity WHERE restaurant_id = $1",
-      [req.params.id]
-    );
-    console.log(results.rows);
-
-    res.status(200).json({
-      status: "retrieve restaurant seating capacity successful",
-      total_tables: results.rows.length,
-      data: { tables: results.rows },
-    });
-  } catch (error) {
-    console.log("GET /api/restaurants", error);
-    if (error) {
-      res.status(400).json({
-        status: "error",
-        message:
-          "an error has occurred when retrieving restaurant seating capacity",
-      });
-    }
-  }
-});
-
-// Create seats capacity
-app.put("/api/restaurants/:id/capacity", async (req, res) => {
-  try {
-    const results = await db.query(
-      "INSERT INTO restaurant_seats_capacity (table_num, table_capacity, table_occupied, restaurant_id) VALUES ($1, $2, $3, $4) RETURNING *",
-      [
-        req.body.table_num,
-        req.body.table_capacity,
-        req.body.table_occupied,
-        req.params.id,
-      ]
-    );
-    res.status(200).json({
-      status: "create successful",
-      total_tables: results.rows.length,
-      data: { tables: results.rows },
-    });
-  } catch (error) {
-    console.log("PUT /api/restaurants/:id/capacity", error);
-    if (error) {
-      res.status(400).json({
-        status: "error",
-        message: "an error has occurred",
-      });
-    }
-  }
-});
-
-// Update seats capacity
-app.patch("/api/restaurants/:id/capacity/:table_num", async (req, res) => {
-  try {
-    const results = await db.query(
-      "UPDATE restaurant_seats_capacity SET table_occupied = $1 WHERE restaurant_id = $2 AND restaurant_seats_capacity.table_num = $3 RETURNING table_num, table_capacity, table_occupied",
-      [req.body.table_occupied, req.params.id, req.params.table_num]
-    );
-    res.status(200).json({
-      status: "update successful",
-      remarks: results.rows[0].table_occupied
-        ? "Table " + results.rows[0].table_num + " is now occupied"
-        : "Table " + results.rows[0].table_num + " is now vacant",
-      data: { table: results.rows[0] },
-    });
-  } catch (error) {
-    console.log("PUT /api/restaurants/:id/capacity", error);
-    if (error) {
-      res.status(400).json({
-        status: "error",
-        message: "an error has occurred",
-      });
-    }
-  }
 });
 
 ///////////////////////////////////////////////////
