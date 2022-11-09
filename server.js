@@ -3,7 +3,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
-const db = require("./db/db");
+
+const restaurants = require("./routers/restaurants/restaurants");
 
 ///////////////  Variables defined  ///////////////
 const app = express();
@@ -14,130 +15,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-///////////////////////////////////////////////////
-//////////////////  RESTAURANTS  //////////////////
-///////////////////////////////////////////////////
-
-// Get a restaurant
-app.post("/api/restaurants/:id", async (req, res) => {
-  try {
-    const results = await db.query("SELECT * FROM restaurants WHERE id = $1", [
-      req.params.id,
-    ]);
-    console.log(results.rows);
-    res.status(200).json({
-      status: "retrieve one restaurant successful",
-      result: results.rows[0].name,
-      data: { restaurant: results.rows[0] },
-    });
-  } catch (error) {
-    console.log("POST /api/restaurants/:id", error);
-    if (error) {
-      res.status(400).json({
-        status: "error",
-        message: "an error has occurred when retrieving restaurant profile",
-      });
-    }
-  }
-});
-
-// Update a restaurant
-app.patch("/api/restaurants/:id", async (req, res) => {
-  try {
-    const results = await db.query(
-      "UPDATE restaurants SET name = $1, address_line_1 = $2, address_line_2 = $3, country = $4, postal_code = $5, website = $6, tel = $7, table_for_2 = $8, table_for_4 = $9, table_for_6 = $10, table_for_8 = $11, table_for_10 = $12, in_operation = $13 WHERE id = $14 RETURNING *",
-      [
-        req.body.name,
-        req.body.address_line_1,
-        req.body.address_line_2,
-        req.body.country,
-        req.body.postal_code,
-        req.body.website,
-        req.body.tel,
-        req.body.table_for_2,
-        req.body.table_for_4,
-        req.body.table_for_6,
-        req.body.table_for_8,
-        req.body.table_for_10,
-        req.body.in_operation,
-        req.params.id,
-      ]
-    );
-    console.log(results.rows);
-    res.status(200).json({
-      status: "update successful",
-      result: results.rows[0].name,
-      data: { restaurant: results.rows[0] },
-    });
-  } catch (error) {
-    console.log("PATCH /api/restaurants/:id", error);
-    if (error) {
-      res.status(400).json({
-        status: "error",
-        message: "an error has occurred when updating restaurant profile",
-      });
-    }
-  }
-});
-
-// Create a restaurant
-app.put("/api/restaurants", async (req, res) => {
-  try {
-    const results = await db.query(
-      "INSERT INTO restaurants (name, address_line_1, address_line_2, country, postal_code, website, tel, table_for_2, table_for_4, table_for_6, table_for_8, table_for_10, in_operation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *",
-      [
-        req.body.name,
-        req.body.address_line_1,
-        req.body.address_line_2,
-        req.body.country,
-        req.body.postal_code,
-        req.body.website,
-        req.body.tel,
-        req.body.table_for_2,
-        req.body.table_for_4,
-        req.body.table_for_6,
-        req.body.table_for_8,
-        req.body.table_for_10,
-        req.body.in_operation,
-      ]
-    );
-    res.status(200).json({
-      status: "create successful",
-      data: { restaurant: results.rows[0] },
-    });
-  } catch (error) {
-    console.log("PUT /api/restaurants", error);
-    if (error) {
-      res.status(400).json({
-        status: "error",
-        message: "an error has occurred when creating restaurant profile",
-      });
-    }
-  }
-});
-
-// Get all restaurants
-app.get("/api/restaurants", async (req, res) => {
-  try {
-    const results = await db.query("SELECT * FROM restaurants");
-    console.log(results.rows);
-    res.status(200).json({
-      status: "retrieve all restaurants successful",
-      total_results: results.rows.length,
-      data: {
-        restaurants: results.rows,
-      },
-    });
-  } catch (error) {
-    console.log("GET /api/restaurants", error);
-    if (error) {
-      res.status(400).json({
-        status: "error",
-        message: "an error has occurred when retrieving restaurants listing",
-      });
-    }
-  }
-});
+////////////////////  ROUTES  /////////////////////
+app.use("/api/restaurants", restaurants);
 
 ///////////////////////////////////////////////////
 ////////////////  RESTAURANT STAFF  ///////////////
