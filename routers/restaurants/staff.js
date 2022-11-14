@@ -11,9 +11,9 @@ const {
 
 ///////////////////  ENDPOINTS  ///////////////////
 router.post("/:id/staff/:staff_id", getOneStaff);
-router.patch("/:id/staff/:staff_id", updateStaff);
-router.delete("/:id/staff/:staff_id", deleteStaff);
-router.put("/:id/staff/", createStaff);
+router.patch("/:id/staff/update", updateStaff);
+router.delete("/:id/staff/delete", deleteStaff);
+router.put("/:id/staff/create", createStaff);
 router.get("/:id/staff/", getAllStaff);
 
 module.exports = router;

@@ -4,7 +4,7 @@ const db = require("../../db/db");
 const getRestaurantCapacity = async (req, res) => {
   try {
     const results = await db.query(
-      "SELECT table_num, table_capacity, table_occupied FROM restaurant_seats_capacity WHERE restaurant_id = $1",
+      "SELECT table_num, table_capacity, table_occupied FROM restaurant_seats_capacity WHERE restaurant_id = $1 ORDER BY table_num",
       [req.params.id]
     );
     console.log(results.rows);
@@ -31,7 +31,7 @@ const updateRestaurantCapacity = async (req, res) => {
   try {
     const results = await db.query(
       "UPDATE restaurant_seats_capacity SET table_occupied = $1 WHERE restaurant_id = $2 AND restaurant_seats_capacity.table_num = $3 RETURNING table_num, table_capacity, table_occupied",
-      [req.body.table_occupied, req.params.id, req.params.table_num]
+      [req.body.table_occupied, req.params.id, req.body.table_num]
     );
     res.status(200).json({
       status: "update successful",
@@ -41,7 +41,7 @@ const updateRestaurantCapacity = async (req, res) => {
       data: { table: results.rows[0] },
     });
   } catch (error) {
-    console.log("PUT /api/restaurants/:id/capacity/:table_num", error);
+    console.log("PATCH /api/restaurants/:id/capacity", error);
     if (error) {
       res.status(400).json({
         status: "error",

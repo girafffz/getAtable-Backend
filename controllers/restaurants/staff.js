@@ -38,7 +38,7 @@ const updateStaff = async (req, res) => {
         req.body.role,
         req.body.resigned,
         req.params.id,
-        req.params.staff_id,
+        req.body.staff_id,
       ]
     );
     console.log(results.rows);
@@ -48,7 +48,7 @@ const updateStaff = async (req, res) => {
       data: { staff: results.rows[0] },
     });
   } catch (error) {
-    console.log("PATCH /api/restaurants/:id/staff/:staff_id", error);
+    console.log("PATCH /api/restaurants/:id/staff/update", error);
     if (error) {
       res.status(400).json({
         status: "error",
@@ -63,14 +63,14 @@ const deleteStaff = async (req, res) => {
   try {
     const results = await db.query(
       "DELETE FROM restaurant_staff WHERE id = $1 AND restaurant_id = $2",
-      [req.params.staff_id, req.params.id]
+      [req.body.staff_id, req.params.id]
     );
     console.log(results.rows);
     res.status(200).json({
       status: "delete successful",
     });
   } catch (error) {
-    console.log("DELETE /api/restaurants/:id/staff/:staff_id", error);
+    console.log("DELETE /api/restaurants/:id/staff/delete", error);
     if (error) {
       res.status(400).json({
         status: "error",
@@ -96,7 +96,7 @@ const createStaff = async (req, res) => {
     if (!duplicatedUsername) {
       const hash = await bcrypt.hash(req.body.password, 12);
       const results = await db.query(
-        "INSERT INTO restaurant_staff (username, name, last_name, email, password, role, resigned, restaurant_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+        "INSERT INTO restaurant_staff (username, name, last_name, email, password, role, restaurant_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
         [
           req.body.username,
           req.body.name,
@@ -104,7 +104,6 @@ const createStaff = async (req, res) => {
           req.body.email,
           hash,
           req.body.role,
-          req.body.resigned,
           req.params.id,
         ]
       );
@@ -121,7 +120,7 @@ const createStaff = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("PUT /api/restaurants/:id/staff", error);
+    console.log("PUT /api/restaurants/:id/staff/create", error);
     if (error) {
       res.status(400).json({
         status: "error",

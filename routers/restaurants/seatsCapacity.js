@@ -9,7 +9,7 @@ const {
 
 ///////////////////  ENDPOINTS  ///////////////////
 router.get("/:id/capacity", getRestaurantCapacity);
-router.patch("/:id/capacity/:table_num", updateRestaurantCapacity);
+router.patch("/:id/capacity", updateRestaurantCapacity);
 router.put("/:id/capacity", createRestaurantCapacity);
 
 module.exports = router;
