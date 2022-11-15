@@ -29,21 +29,27 @@ const login = async (req, res) => {
 
       console.log(staffInfo.rows);
 
-      const validPassword = await bcrypt.compare(
-        req.body.password,
-        staffInfo.rows[0].password
-      ); // parse in 2 things, if matched will return true. Order here is important.
-      console.log(`yay`);
-      if (!validPassword) {
-        console.log("username or password error");
+      if (!staffInfo.rows[0].resigned) {
+        const validPassword = await bcrypt.compare(
+          req.body.password,
+          staffInfo.rows[0].password
+        ); // parse in 2 things, if matched will return true. Order here is important.
+        console.log(`yay`);
+        if (!validPassword) {
+          console.log("username or password error");
+          return res
+            .status(401)
+            .json({ status: "error", message: "login failed" });
+        } else {
+          console.log(`login OK`);
+          return res
+            .status(200)
+            .json({ status: "successful", data: staffInfo.rows[0] });
+        }
+      } else {
         return res
           .status(401)
-          .json({ status: "error", message: "login failed" });
-      } else {
-        console.log(`login OK`);
-        return res
-          .status(200)
-          .json({ status: "successful", data: staffInfo.rows[0] });
+          .json({ status: "error", message: "account does not exist" });
       }
     }
   } catch (error) {
