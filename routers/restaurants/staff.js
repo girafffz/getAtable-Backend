@@ -7,13 +7,15 @@ const {
   deleteStaff,
   createStaff,
   getAllStaff,
+  login,
 } = require("../../controllers/restaurants/staff");
 
 ///////////////////  ENDPOINTS  ///////////////////
-router.post("/:id/staff/:staff_id", getOneStaff);
+router.post("/staff/login", login);
 router.patch("/:id/staff/update", updateStaff);
 router.delete("/:id/staff/delete", deleteStaff);
 router.put("/:id/staff/create", createStaff);
-router.get("/:id/staff/", getAllStaff);
+router.post("/:id/staff", getOneStaff);
+router.get("/:id/staff", getAllStaff);
 
 module.exports = router;

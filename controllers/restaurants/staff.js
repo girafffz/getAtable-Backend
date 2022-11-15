@@ -1,12 +1,63 @@
 const db = require("../../db/db");
 const bcrypt = require("bcrypt");
 
+//////////////////  LOGIN STAFF  ///////////////////
+const login = async (req, res) => {
+  try {
+    // Find user with the email
+    const findStaff = await db.query(
+      "SELECT EXISTS (SELECT email FROM restaurant_staff WHERE email = $1)",
+      [req.body.email]
+    );
+
+    // Storing result returned into another variable
+    const staff = findStaff.rows[0].exists;
+
+    console.log("staff:", staff);
+
+    if (!staff) {
+      return res
+        .status(401)
+        .json({ status: "error", message: "not authorised" });
+    }
+
+    if (staff) {
+      const staffInfo = await db.query(
+        "SELECT * FROM restaurant_staff WHERE email = $1",
+        [req.body.email]
+      );
+
+      console.log(staffInfo.rows);
+
+      const validPassword = await bcrypt.compare(
+        req.body.password,
+        staffInfo.rows[0].password
+      ); // parse in 2 things, if matched will return true. Order here is important.
+      console.log(`yay`);
+      if (!validPassword) {
+        console.log("username or password error");
+        return res
+          .status(401)
+          .json({ status: "error", message: "login failed" });
+      } else {
+        console.log(`login OK`);
+        return res
+          .status(200)
+          .json({ status: "successful", data: staffInfo.rows[0] });
+      }
+    }
+  } catch (error) {
+    console.log("POST /api/restaurants/staff/login", error);
+    res.status(400).json({ status: "error", message: "login failed" });
+  }
+};
+
 /////////////////  GET ONE STAFF  /////////////////
 const getOneStaff = async (req, res) => {
   try {
     const results = await db.query(
       "SELECT restaurant_staff.id, username, restaurant_staff.name, last_name, email, role, resigned FROM restaurant_staff where restaurant_id = $1 AND restaurant_staff.id = $2",
-      [req.params.id, req.params.staff_id]
+      [req.params.id, req.body.staff_id]
     );
     console.log(results.rows);
     res.status(200).json({
@@ -15,7 +66,7 @@ const getOneStaff = async (req, res) => {
       data: { staff: results.rows[0] },
     });
   } catch (error) {
-    console.log("POST /api/restaurants/:id/staff/:staff_id", error);
+    console.log("POST /api/restaurants/:id/staff", error);
     if (error) {
       res.status(400).json({
         status: "error",
@@ -27,6 +78,8 @@ const getOneStaff = async (req, res) => {
 
 /////////////////  UPDATE STAFF  //////////////////
 const updateStaff = async (req, res) => {
+  console.log("update data", req.body);
+  console.log(req.body.name);
   try {
     const results = await db.query(
       "UPDATE restaurant_staff SET username = $1, name = $2, last_name = $3, email = $4, role = $5, resigned = $6 WHERE restaurant_id = $7 AND id = $8 RETURNING id, username, name, last_name, email, role, resigned",
@@ -38,7 +91,7 @@ const updateStaff = async (req, res) => {
         req.body.role,
         req.body.resigned,
         req.params.id,
-        req.body.staff_id,
+        req.body.id,
       ]
     );
     console.log(results.rows);
@@ -134,7 +187,7 @@ const createStaff = async (req, res) => {
 const getAllStaff = async (req, res) => {
   try {
     const results = await db.query(
-      "SELECT id, username, name, last_name, email, role, resigned FROM restaurant_staff WHERE restaurant_id = $1",
+      "SELECT id, username, name, last_name, email, role, resigned FROM restaurant_staff WHERE restaurant_id = $1 ORDER BY id DESC",
       [req.params.id]
     );
     console.log(results.rows);
@@ -162,4 +215,5 @@ module.exports = {
   deleteStaff,
   createStaff,
   getAllStaff,
+  login,
 };
