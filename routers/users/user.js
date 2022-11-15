@@ -9,12 +9,10 @@ const {
   createUser,
   getAllUsers,
   login,
-  refresh,
 } = require("../../controllers/users/users");
 
 ///////////////////  ENDPOINTS  ///////////////////
 router.post("/login", login);
-router.post("/refresh", refresh);
 router.put("/register", createUser);
 router.post("/:user_id", getOneUser);
 router.patch("/:user_id", updateUser);

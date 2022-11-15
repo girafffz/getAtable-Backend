@@ -1,7 +1,105 @@
 const db = require("../../db/db");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { v4: uuidv4 } = require("uuid");
+// const jwt = require("jsonwebtoken");
+// const { v4: uuidv4 } = require("uuid");
+
+// //////////////////  LOGIN USER (JWT) ///////////////////
+// const login = async (req, res) => {
+//   try {
+//     // Find user with the email
+//     const findUser = await db.query(
+//       "SELECT EXISTS (SELECT email FROM users WHERE email = $1)",
+//       [req.body.email]
+//     );
+
+//     // Storing result returned into another variable
+//     const user = findUser.rows[0].exists;
+
+//     console.log("user:", user);
+
+//     if (!user) {
+//       return res
+//         .status(401)
+//         .json({ status: "error", message: "not authorised" });
+//     }
+
+//     if (user) {
+//       const userInfo = await db.query("SELECT * FROM users WHERE email = $1", [
+//         req.body.email,
+//       ]);
+
+//       console.log(userInfo.rows);
+
+//       const validPassword = await bcrypt.compare(
+//         req.body.password,
+//         userInfo.rows[0].password
+//       ); // parse in 2 things, if matched will return true. Order here is important.
+
+//       if (!validPassword) {
+//         console.log("username or password error");
+//         return res
+//           .status(401)
+//           .json({ status: "error", message: "login failed" });
+//       } else {
+//         const payload = {
+//           id: userInfo.rows[0].id,
+//           email: userInfo.rows[0].email,
+//         };
+
+//         const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
+//           expiresIn: "20m",
+//           jwtid: uuidv4(),
+//         });
+
+//         const refresh = jwt.sign(payload, process.env.REFRESH_SECRET, {
+//           expiresIn: "30d",
+//           jwtid: uuidv4(),
+//         });
+
+//         const response = {
+//           access,
+//           refresh,
+//         };
+
+//         return res.status(200).json({ status: "successful", response });
+//       }
+//     }
+//   } catch (error) {
+//     console.log("POST /api/users/login", error);
+//     res.status(400).json({ status: "error", message: "login failed" });
+//   }
+// };
+
+// ///////////////////  REFRESH  /////////////////////
+// const refresh = (req, res) => {
+//   try {
+//     const decoded = jwt.verify(req.body.refresh, process.env.REFRESH_SECRET);
+
+//     console.log(decoded);
+
+//     const payload = {
+//       id: decoded.id, // creating the same payload on top
+//       email: decoded.email,
+//     };
+
+//     const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
+//       expiresIn: "20m",
+//       jwtid: uuidv4(), // for the creation of jti (within jwt's payload section) - helps to link refresh and access tokens
+//     });
+
+//     const response = {
+//       access,
+//     };
+
+//     res.json(response);
+//   } catch (error) {
+//     console.log("POST /api/users/refresh", error);
+//     res.status(401).json({
+//       status: "error",
+//       message: "not authorised",
+//     });
+//   }
+// };
 
 //////////////////  LOGIN USER  ///////////////////
 const login = async (req, res) => {
@@ -41,63 +139,14 @@ const login = async (req, res) => {
           .status(401)
           .json({ status: "error", message: "login failed" });
       } else {
-        const payload = {
-          id: userInfo.rows[0].id,
-          email: userInfo.rows[0].email,
-        };
-
-        const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
-          expiresIn: "20m",
-          jwtid: uuidv4(),
-        });
-
-        const refresh = jwt.sign(payload, process.env.REFRESH_SECRET, {
-          expiresIn: "30d",
-          jwtid: uuidv4(),
-        });
-
-        const response = {
-          access,
-          refresh,
-        };
-
-        return res.status(200).json({ status: "successful", response });
+        return res
+          .status(200)
+          .json({ status: "successful", data: userInfo.rows[0] });
       }
     }
   } catch (error) {
     console.log("POST /api/users/login", error);
     res.status(400).json({ status: "error", message: "login failed" });
-  }
-};
-
-///////////////////  REFRESH  /////////////////////
-const refresh = (req, res) => {
-  try {
-    const decoded = jwt.verify(req.body.refresh, process.env.REFRESH_SECRET);
-
-    console.log(decoded);
-
-    const payload = {
-      id: decoded.id, // creating the same payload on top
-      email: decoded.email,
-    };
-
-    const access = jwt.sign(payload, process.env.ACCESS_SECRET, {
-      expiresIn: "20m",
-      jwtid: uuidv4(), // for the creation of jti (within jwt's payload section) - helps to link refresh and access tokens
-    });
-
-    const response = {
-      access,
-    };
-
-    res.json(response);
-  } catch (error) {
-    console.log("POST /api/users/refresh", error);
-    res.status(401).json({
-      status: "error",
-      message: "not authorised",
-    });
   }
 };
 
@@ -237,5 +286,4 @@ module.exports = {
   createUser,
   getAllUsers,
   login,
-  refresh,
 };
