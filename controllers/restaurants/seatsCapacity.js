@@ -9,10 +9,24 @@ const getRestaurantCapacity = async (req, res) => {
     );
     console.log(results.rows);
 
+    const capacity = await db.query(
+      "SELECT SUM(table_capacity::int) as max_capacity FROM restaurant_seats_capacity WHERE restaurant_id = $1",
+      [req.params.id]
+    );
+
+    const unoccupied = await db.query(
+      "SELECT SUM(table_capacity::int) as empty_seats FROM restaurant_seats_capacity WHERE restaurant_id = $1 AND table_occupied = false;",
+      [req.params.id]
+    );
+
     res.status(200).json({
       status: "retrieve restaurant seating capacity successful",
       total_tables: results.rows.length,
-      data: { tables: results.rows },
+      data: {
+        tables: results.rows,
+        max_capacity: capacity.rows[0].max_capacity,
+        seats_available: unoccupied.rows[0].empty_seats,
+      },
     });
   } catch (error) {
     console.log("GET /api/restaurants/:id/capacity", error);
