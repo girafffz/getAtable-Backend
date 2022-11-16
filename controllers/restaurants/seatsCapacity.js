@@ -4,7 +4,7 @@ const db = require("../../db/db");
 const getRestaurantCapacity = async (req, res) => {
   try {
     const results = await db.query(
-      "SELECT table_num, table_capacity, table_occupied FROM restaurant_seats_capacity WHERE restaurant_id = $1 ORDER BY table_num",
+      "SELECT table_num, table_capacity, table_occupied FROM restaurant_seats_capacity WHERE restaurant_id = $1 ORDER BY table_num::int ASC",
       [req.params.id]
     );
     console.log(results.rows);
