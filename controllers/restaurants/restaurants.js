@@ -61,7 +61,7 @@ const updateRestaurant = async (req, res) => {
 const createRestaurant = async (req, res) => {
   try {
     const results = await db.query(
-      "INSERT INTO restaurants (name, address_line_1, address_line_2, country, postal_code, website, tel, in_operation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+      "INSERT INTO restaurants (name, address_line_1, address_line_2, country, postal_code, website, tel) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
       [
         req.body.name,
         req.body.address_line_1,
@@ -70,7 +70,6 @@ const createRestaurant = async (req, res) => {
         req.body.postal_code,
         req.body.website,
         req.body.tel,
-        req.body.in_operation,
       ]
     );
     res.status(200).json({
