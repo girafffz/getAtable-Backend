@@ -65,6 +65,28 @@ const updateRestaurantCapacity = async (req, res) => {
   }
 };
 
+//////////  DELETE RESTAURANT CAPACITY  ///////////
+const deleteRestaurantCapacity = async (req, res) => {
+  try {
+    const results = await db.query(
+      "DELETE FROM restaurant_seats_capacity WHERE table_num = $1 AND restaurant_id = $2",
+      [req.body.table_num, req.params.id]
+    );
+    console.log(results.rows);
+    res.status(200).json({
+      status: "delete successful",
+    });
+  } catch (error) {
+    console.log("DELETE /api/restaurants/:id/capacity", error);
+    if (error) {
+      res.status(400).json({
+        status: "error",
+        message: "an error has occurred when deleting a staff profile",
+      });
+    }
+  }
+};
+
 //////////  CREATE RESTAURANT CAPACITY  ///////////
 const createRestaurantCapacity = async (req, res) => {
   try {
@@ -91,5 +113,6 @@ const createRestaurantCapacity = async (req, res) => {
 module.exports = {
   getRestaurantCapacity,
   updateRestaurantCapacity,
+  deleteRestaurantCapacity,
   createRestaurantCapacity,
 };
