@@ -69,13 +69,8 @@ const updateRestaurantCapacity = async (req, res) => {
 const createRestaurantCapacity = async (req, res) => {
   try {
     const results = await db.query(
-      "INSERT INTO restaurant_seats_capacity (table_num, table_capacity, table_occupied, restaurant_id) VALUES ($1, $2, $3, $4) RETURNING *",
-      [
-        req.body.table_num,
-        req.body.table_capacity,
-        req.body.table_occupied,
-        req.params.id,
-      ]
+      "INSERT INTO restaurant_seats_capacity (table_num, table_capacity, restaurant_id) VALUES ($1, $2, $3) RETURNING *",
+      [req.body.table_num, req.body.table_capacity, req.params.id]
     );
     res.status(200).json({
       status: "create successful",
