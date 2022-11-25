@@ -139,6 +139,39 @@ const deleteStaff = async (req, res) => {
   }
 };
 
+/////////  CREATE FIRST MANAGER ACCOUNT  //////////
+const createFirstManager = async (req, res) => {
+  try {
+    const hash = await bcrypt.hash(req.body.password, 12);
+    const results = await db.query(
+      "INSERT INTO restaurant_staff (username, name, last_name, email, password, role, restaurant_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [
+        req.body.username,
+        req.body.name,
+        req.body.last_name,
+        req.body.email,
+        hash,
+        req.body.role,
+        req.body.id,
+      ]
+    );
+    console.log(results.rows);
+    console.log(req.params.id);
+    res.status(200).json({
+      status: "create successful",
+      data: { staff: results.rows[0] },
+    });
+  } catch (error) {
+    console.log("PUT /api/restaurants/first-manager", error);
+    if (error) {
+      res.status(400).json({
+        status: "error",
+        message: "an error has occurred when creating a staff profile",
+      });
+    }
+  }
+};
+
 /////////////////  CREATE STAFF  //////////////////
 const createStaff = async (req, res) => {
   try {
@@ -221,5 +254,6 @@ module.exports = {
   deleteStaff,
   createStaff,
   getAllStaff,
+  createFirstManager,
   login,
 };
