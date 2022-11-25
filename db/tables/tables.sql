@@ -88,7 +88,8 @@ CREATE TABLE restaurant_media (
 
 
 CREATE TABLE restaurant_seats_capacity (
-    table_num VARCHAR(2) NOT NULL PRIMARY KEY,
+    id SERIAL NOT NULL PRIMARY KEY,
+    table_num VARCHAR(2) NOT NULL,
     table_capacity VARCHAR(2) NOT NULL,
     table_occupied BOOLEAN DEFAULT false,
     restaurant_id INT NOT NULL REFERENCES restaurants(id)
