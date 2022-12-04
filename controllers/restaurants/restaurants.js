@@ -90,15 +90,32 @@ const createRestaurant = async (req, res) => {
 ///////////////  GET ALL RESTAURANT  //////////////
 const getAllRestaurants = async (req, res) => {
   try {
-    const results = await db.query("SELECT * FROM restaurants");
-    console.log(results.rows);
-    res.status(200).json({
-      status: "retrieve all restaurants successful",
-      total_results: results.rows.length,
-      data: {
-        restaurants: results.rows,
-      },
-    });
+    if (!req.body.search) {
+      const results = await db.query(
+        "SELECT * FROM restaurants FULL JOIN restaurant_locations on restaurants.id = restaurant_locations.restaurant_id FULL JOIN restaurant_cuisines on restaurants.id = restaurant_cuisines.id FULL JOIN restaurant_operating_hours on restaurants.id = restaurant_operating_hours.id FULL JOIN restaurant_seats_capacity on restaurants.id = restaurant_seats_capacity.id FULL JOIN restaurant_tags on restaurants.id = restaurant_tags.id LIMIT 10"
+      );
+      console.log(results.rows);
+      res.status(200).json({
+        status: "retrieve all restaurants successful",
+        total_results: results.rows.length,
+        data: {
+          restaurants: results.rows,
+        },
+      });
+    } else {
+      const results = await db.query(
+        "SELECT * FROM restaurants FULL JOIN restaurant_locations on restaurants.id = restaurant_locations.restaurant_id FULL JOIN restaurant_cuisines on restaurants.id = restaurant_cuisines.id FULL JOIN restaurant_operating_hours on restaurants.id = restaurant_operating_hours.id FULL JOIN restaurant_seats_capacity on restaurants.id = restaurant_seats_capacity.id FULL JOIN restaurant_tags on restaurants.id = restaurant_tags.id WHERE (restaurants.name ILIKE $1) OR (restaurants.building_name ILIKE $1) OR (restaurant_locations.location_id ILIKE $1)",
+        [`%${req.body.search}%`]
+      );
+      console.log(results.rows);
+      res.status(200).json({
+        status: "retrieve all restaurants successful",
+        total_results: results.rows.length,
+        data: {
+          restaurants: results.rows,
+        },
+      });
+    }
   } catch (error) {
     console.log("GET /api/restaurants", error);
     if (error) {
