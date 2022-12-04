@@ -3,10 +3,12 @@ CREATE TABLE restaurants (
     name VARCHAR(50) NOT NULL,
     address_line_1 VARCHAR(50) NOT NULL,
     address_line_2 VARCHAR(50),
+    building_name VARCHAR(80),
     country VARCHAR(50) DEFAULT 'Singapore',
     postal_code VARCHAR(6) NOT NULL,
-    website VARCHAR(50),
+    website VARCHAR(100),
     tel VARCHAR(11),
+    description TEXT,
     in_operation BOOLEAN DEFAULT 'true'
 );
 
@@ -23,16 +25,13 @@ CREATE TABLE restaurant_operating_hours (
     restaurant_id INT NOT NULL REFERENCES restaurants(id)
 );
 
--- not in use yet
 CREATE TABLE locations (
     location VARCHAR(50) NOT NULL PRIMARY KEY
 );
 
--- not in use yet
 CREATE TABLE restaurant_locations (
-    id SERIAL NOT NULL PRIMARY KEY,
     location_id VARCHAR(50) NOT NULL REFERENCES locations(location),
-    restaurant_id INT NOT NULL REFERENCES restaurants(id)
+    restaurant_id INT NOT NULL PRIMARY KEY REFERENCES restaurants(id)
 );
 
 
