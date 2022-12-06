@@ -40,6 +40,38 @@ const getRestaurantCapacity = async (req, res) => {
   }
 };
 
+///////////////  SEARCH CAPACITY  /////////////////
+const searchRestaurantCapacity = async (req, res) => {
+  try {
+    const capacity = await db.query(
+      "SELECT SUM(table_capacity::int) as max_capacity FROM restaurant_seats_capacity WHERE restaurant_id = $1",
+      [req.body.id]
+    );
+
+    const unoccupied = await db.query(
+      "SELECT SUM(table_capacity::int) as empty_seats FROM restaurant_seats_capacity WHERE restaurant_id = $1 AND table_occupied = false;",
+      [req.body.id]
+    );
+
+    res.status(200).json({
+      status: "retrieve restaurant seating capacity successful",
+      data: {
+        max_capacity: capacity.rows[0].max_capacity,
+        seats_available: unoccupied.rows[0].empty_seats,
+      },
+    });
+  } catch (error) {
+    console.log("POST /api/restaurants/capacity", error);
+    if (error) {
+      res.status(400).json({
+        status: "error",
+        message:
+          "an error has occurred when retrieving restaurant seating capacity",
+      });
+    }
+  }
+};
+
 //////////  UPDATE RESTAURANT CAPACITY  ///////////
 const updateRestaurantCapacity = async (req, res) => {
   try {
@@ -112,6 +144,7 @@ const createRestaurantCapacity = async (req, res) => {
 
 module.exports = {
   getRestaurantCapacity,
+  searchRestaurantCapacity,
   updateRestaurantCapacity,
   deleteRestaurantCapacity,
   createRestaurantCapacity,
