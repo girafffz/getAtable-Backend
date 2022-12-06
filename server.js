@@ -18,9 +18,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 ////////////////////  ROUTES  /////////////////////
+app.use("/api/restaurants", seatsCapacity);
 app.use("/api/restaurants", restaurants);
 app.use("/api/restaurants", staff);
-app.use("/api/restaurants", seatsCapacity);
 app.use("/api/users", users);
 
 ///////////////////////////////////////////////////
