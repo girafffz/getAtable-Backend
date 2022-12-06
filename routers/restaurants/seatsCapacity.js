@@ -3,6 +3,7 @@ const router = express.Router();
 
 const {
   getRestaurantCapacity,
+  searchRestaurantCapacity,
   updateRestaurantCapacity,
   deleteRestaurantCapacity,
   createRestaurantCapacity,
@@ -13,5 +14,6 @@ router.get("/:id/capacity", getRestaurantCapacity);
 router.patch("/:id/capacity", updateRestaurantCapacity);
 router.delete("/:id/capacity", deleteRestaurantCapacity);
 router.put("/:id/capacity", createRestaurantCapacity);
+router.post("/capacity", searchRestaurantCapacity);
 
 module.exports = router;
