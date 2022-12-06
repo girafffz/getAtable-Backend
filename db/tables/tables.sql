@@ -14,15 +14,42 @@ CREATE TABLE restaurants (
 
 -- not in use yet
 CREATE TABLE restaurant_operating_hours (
-    id SERIAL NOT NULL PRIMARY KEY,
-    day VARCHAR(10) NOT NULL,
-    day_off BOOLEAN DEFAULT false,
-    opening_time TIME,
-    closing_time TIME,
-    opening_time_2 TIME,
-    closing_time_2 TIME,
-    last_order_time TIME,
-    restaurant_id INT NOT NULL REFERENCES restaurants(id)
+    restaurant_id INT NOT NULL PRIMARY KEY REFERENCES restaurants(id),
+    mon_day_off BOOLEAN DEFAULT false,
+    mon_opening_time TIME,
+    mon_closing_time TIME,
+    mon_opening_time_2 TIME,
+    mon_closing_time_2 TIME,
+    tues_day_off BOOLEAN DEFAULT false,
+    tues_opening_time TIME,
+    tues_closing_time TIME,
+    tues_opening_time_2 TIME,
+    tues_closing_time_2 TIME,
+    wed_day_off BOOLEAN DEFAULT false,
+    wed_opening_time TIME,
+    wed_closing_time TIME,
+    wed_opening_time_2 TIME,
+    wed_closing_time_2 TIME,
+    thurs_day_off BOOLEAN DEFAULT false,
+    thurs_opening_time TIME,
+    thurs_closing_time TIME,
+    thurs_opening_time_2 TIME,
+    thurs_closing_time_2 TIME,
+    fri_day_off BOOLEAN DEFAULT false,
+    fri_opening_time TIME,
+    fri_closing_time TIME,
+    fri_opening_time_2 TIME,
+    fri_closing_time_2 TIME,
+    sat_day_off BOOLEAN DEFAULT false,
+    sat_opening_time TIME,
+    sat_closing_time TIME,
+    sat_opening_time_2 TIME,
+    sat_closing_time_2 TIME,
+    sun_day_off BOOLEAN DEFAULT false,
+    sun_opening_time TIME,
+    sun_closing_time TIME,
+    sun_opening_time_2 TIME,
+    sun_closing_time_2 TIME
 );
 
 CREATE TABLE locations (
@@ -41,9 +68,10 @@ CREATE TABLE cuisines (
 
 
 CREATE TABLE restaurant_cuisines (
-    id SERIAL NOT NULL PRIMARY KEY,
-    cuisine_id VARCHAR(20) NOT NULL REFERENCES cuisines(cuisine),
-    restaurant_id INT NOT NULL REFERENCES restaurants(id)
+    restaurant_id INT NOT NULL PRIMARY KEY REFERENCES restaurants(id),
+    cuisine_1 VARCHAR(20) NOT NULL REFERENCES cuisines(cuisine),
+    cuisine_2 VARCHAR(20) NOT NULL REFERENCES cuisines(cuisine),
+    cuisine_3 VARCHAR(20) NOT NULL REFERENCES cuisines(cuisine)
 );
 
 -- not in use yet
@@ -51,11 +79,14 @@ CREATE TABLE tags (
     tag VARCHAR(50) NOT NULL PRIMARY KEY
 );
 
--- not in use yet
 CREATE TABLE restaurant_tags (
-    id SERIAL NOT NULL PRIMARY KEY,
-    tag_id VARCHAR(50) NOT NULL REFERENCES tags(tag),
-    restaurant_id INT NOT NULL REFERENCES restaurants(id)
+    restaurant_id INT NOT NULL PRIMARY KEY REFERENCES restaurants(id),
+    tag_1 VARCHAR(50) NOT NULL REFERENCES tags(tag),
+    tag_2 VARCHAR(50) NOT NULL REFERENCES tags(tag),
+    tag_3 VARCHAR(50) NOT NULL REFERENCES tags(tag),
+    tag_4 VARCHAR(50) NOT NULL REFERENCES tags(tag),
+    tag_5 VARCHAR(50) NOT NULL REFERENCES tags(tag),
+    tag_6 VARCHAR(50) NOT NULL REFERENCES tags(tag)
 );
 
 
