@@ -90,9 +90,9 @@ const createRestaurant = async (req, res) => {
 ///////////////  GET ALL RESTAURANT  //////////////
 const getAllRestaurants = async (req, res) => {
   try {
-    if (!req.body.search) {
+    if (!req.body.searchInput) {
       const results = await db.query(
-        "SELECT * FROM restaurants FULL JOIN restaurant_locations on restaurants.id = restaurant_locations.restaurant_id FULL JOIN restaurant_cuisines on restaurants.id = restaurant_cuisines.id FULL JOIN restaurant_operating_hours on restaurants.id = restaurant_operating_hours.id FULL JOIN restaurant_seats_capacity on restaurants.id = restaurant_seats_capacity.id FULL JOIN restaurant_tags on restaurants.id = restaurant_tags.id LIMIT 10"
+        "SELECT * FROM restaurants FULL JOIN restaurant_locations on restaurants.id = restaurant_locations.restaurant_id FULL JOIN restaurant_cuisines on restaurants.id = restaurant_cuisines.restaurant_id FULL JOIN restaurant_operating_hours on restaurants.id = restaurant_operating_hours.restaurant_id FULL JOIN restaurant_tags on restaurants.id = restaurant_tags.restaurant_id LIMIT 12"
       );
       console.log(results.rows);
       res.status(200).json({
@@ -104,8 +104,8 @@ const getAllRestaurants = async (req, res) => {
       });
     } else {
       const results = await db.query(
-        "SELECT * FROM restaurants FULL JOIN restaurant_locations on restaurants.id = restaurant_locations.restaurant_id FULL JOIN restaurant_cuisines on restaurants.id = restaurant_cuisines.id FULL JOIN restaurant_operating_hours on restaurants.id = restaurant_operating_hours.id FULL JOIN restaurant_seats_capacity on restaurants.id = restaurant_seats_capacity.id FULL JOIN restaurant_tags on restaurants.id = restaurant_tags.id WHERE (restaurants.name ILIKE $1) OR (restaurants.building_name ILIKE $1) OR (restaurant_locations.location_id ILIKE $1)",
-        [`%${req.body.search}%`]
+        "SELECT * FROM restaurants FULL JOIN restaurant_locations on restaurants.id = restaurant_locations.restaurant_id FULL JOIN restaurant_cuisines on restaurants.id = restaurant_cuisines.restaurant_id FULL JOIN restaurant_operating_hours on restaurants.id = restaurant_operating_hours.restaurant_id FULL JOIN restaurant_tags on restaurants.id = restaurant_tags.restaurant_id WHERE (restaurants.name ILIKE $1) OR (restaurants.building_name ILIKE $1) OR (restaurant_locations.location_id ILIKE $1)",
+        [`%${req.body.searchInput}%`]
       );
       console.log(results.rows);
       res.status(200).json({
