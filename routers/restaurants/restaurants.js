@@ -12,6 +12,7 @@ const {
 router.post("/:id", getOneRestaurant);
 router.patch("/:id", updateRestaurant);
 router.put("/", createRestaurant);
+router.post("/", getAllRestaurants);
 router.get("/", getAllRestaurants);
 
 module.exports = router;
